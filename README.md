@@ -1,117 +1,82 @@
-# MiniECommerce 🛒
+# 🛒 MiniECommerce
 
-A full-featured e-commerce web application built with **ASP.NET Core MVC** and **Entity Framework Core**. The project focuses on clean code, separation of concerns, secure request handling, and maintainable application architecture.
+A full-featured e-commerce web application built with **ASP.NET Core MVC**, **C#**, and **Entity Framework Core**.
 
-## 🚀 Features
+The project focuses on maintainable code, separation of concerns, secure request handling, and practical application of software design patterns.
+
+## ✨ Features
 
 ### 🛍️ Shopping Experience
 
-* Browse and explore products and categories.
+* Browse products and explore categories.
 * View product details and available stock.
 * Add products to a session-based shopping cart.
 * Update cart quantities asynchronously using AJAX.
-* Manage cart items without unnecessary page reloads.
+* Calculate cart totals and manage cart items.
 
 ### 👤 Authentication & Authorization
 
 * User registration and login using ASP.NET Core Identity.
-* Role-based access control for Admin and Customer roles.
+* Role-based authorization for Admin and Customer roles.
 * Protected administrative functionality.
 
-### ⚙️ Admin Management
+### ⚙️ Admin Dashboard
 
 * Manage products and categories.
-* View and manage customer orders.
-* Track order details and update order statuses.
+* View customer orders and order details.
+* Track and manage order statuses.
+* Support product image management.
 
 ### 🔒 Security
 
-* CSRF protection for state-changing HTTP requests.
+* Anti-forgery protection for state-changing requests.
 * Anti-forgery token validation for AJAX requests.
-* Server-side validation and separation of responsibilities.
+* Server-side validation.
 * Authentication and authorization for protected resources.
 
 ## 🧰 Tech Stack
 
-* **Framework:** ASP.NET Core MVC
-* **Language:** C#
-* **ORM:** Entity Framework Core
-* **Database:** Microsoft SQL Server
-* **Authentication:** ASP.NET Core Identity
-* **Frontend:** HTML, CSS, JavaScript, Bootstrap, jQuery
-* **Asynchronous Requests:** AJAX
-* **Architecture Patterns:** Repository Pattern, Unit of Work, Service Layer
-* **Database Approach:** Code-First Migrations
+| Technology            | Purpose                                 |
+| --------------------- | --------------------------------------- |
+| C#                    | Application development                 |
+| ASP.NET Core MVC      | Web application framework               |
+| Entity Framework Core | Object-relational mapping               |
+| Microsoft SQL Server  | Relational database                     |
+| ASP.NET Core Identity | Authentication and authorization        |
+| Razor Views           | Server-side UI rendering                |
+| HTML, CSS, JavaScript | Frontend development                    |
+| Bootstrap and jQuery  | UI styling and client-side interactions |
+| AJAX                  | Asynchronous requests                   |
+| Git and GitHub        | Version control and source management   |
 
-## 🏗️ Architecture & Design
+## 🏗️ Architecture & Design Patterns
 
-The application is organized to separate presentation, business logic, and data access responsibilities.
+The application separates presentation logic, business logic, and data-access responsibilities to improve maintainability and readability.
 
-* **Controllers:** Handle incoming HTTP requests and coordinate application workflows.
-* **Services:** Encapsulate business logic outside the controllers.
-* **Repositories:** Encapsulate data-access operations.
-* **Unit of Work:** Coordinates repository operations.
-* **Models:** Represent application entities.
-* **ViewModels:** Carry the data required by specific views.
-* **Data Layer:** Configures Entity Framework Core and database relationships.
-* **Extensions:** Organize reusable application and service configuration.
+* **MVC Pattern:** Organizes the application into Models, Views, and Controllers.
+* **Repository Pattern:** Encapsulates data-access operations.
+* **Generic Repository:** Provides reusable data-access functionality.
+* **Unit of Work Pattern:** Groups repository operations behind a common abstraction.
+* **Service Layer:** Keeps business logic separate from controllers.
+* **Dependency Injection:** Provides dependencies through ASP.NET Core's built-in DI container.
+* **ViewModels:** Shape data specifically for presentation requirements.
+* **Entity Framework Core Code-First:** Manages database schema changes through migrations.
 
-The project applies **Clean Code principles and separation of concerns**, using architectural patterns to improve readability, maintainability, and testability.
+The project applies separation of concerns and Clean Code principles within a single ASP.NET Core MVC application.
 
 ## 🗄️ Database
 
-The application uses Entity Framework Core with a Code-First workflow and Microsoft SQL Server.
+The application uses **Microsoft SQL Server** with **Entity Framework Core**.
 
-Database schema changes are managed through EF Core migrations.
+The data model includes entities such as:
 
-## ⚙️ Getting Started
+* `ApplicationUser`
+* `Product`
+* `Category`
+* `Order`
+* `OrderItem`
 
-### Prerequisites
-
-Make sure you have the following installed:
-
-* [.NET SDK](https://dotnet.microsoft.com/download)
-* [Microsoft SQL Server](https://www.microsoft.com/en-us/sql-server)
-* Visual Studio or another compatible .NET IDE
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/Mohamed-Hosny-Dev/MiniECommerce.git
-cd MiniECommerce
-```
-
-### 2. Configure the Database
-
-Open `appsettings.json` and configure the connection string used by the application.
-
-Make sure your SQL Server instance is running and that the database connection settings match your local environment.
-
-**Important:** Never commit real passwords, production connection strings, or other sensitive configuration values to source control.
-
-### 3. Restore Dependencies
-
-```bash
-dotnet restore
-```
-
-### 4. Apply Database Migrations
-
-If the project uses EF Core migrations, apply them to your configured database:
-
-```bash
-dotnet ef database update
-```
-
-If the `dotnet ef` command is unavailable, install the EF Core command-line tool and ensure the required design-time package is available in the project.
-
-### 5. Run the Application
-
-```bash
-dotnet run
-```
-
-Open the local URL displayed in the terminal.
+Database relationships and schema changes are managed through the application's DbContext configuration and EF Core migrations.
 
 ## 📁 Project Structure
 
@@ -124,37 +89,5 @@ MiniECommerce/
 ├── Migrations/
 ├── Models/
 ├── Repository/
-├── Services/
-├── ViewModels/
-├── Views/
-├── wwwroot/
-├── Program.cs
-├── appsettings.json
-├── MiniECommerce.csproj
-└── README.md
+├── S
 ```
-
-*The structure above highlights the main application directories.*
-
-## 🎯 Project Goals
-
-This project was built to practice and apply:
-
-* Building server-rendered web applications with ASP.NET Core MVC.
-* Implementing authentication and role-based authorization.
-* Working with Entity Framework Core and SQL Server.
-* Applying Repository and Unit of Work patterns.
-* Separating business logic from controllers.
-* Handling AJAX requests and session-based shopping carts.
-* Managing database schema changes through migrations.
-* Improving application security and maintainability.
-
-## 👨‍💻 Author
-
-**Mohamed Hosny**
-
-GitHub: [Mohamed-Hosny-Dev](https://github.com/Mohamed-Hosny-Dev)
-
----
-
-*Built as a hands-on project to strengthen ASP.NET Core MVC and backend web development skills.*
