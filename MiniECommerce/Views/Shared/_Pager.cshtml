@@ -1,0 +1,55 @@
+@model PagerViewModel
+@{
+    string Href(int page)
+    {
+        var routeValues = new RouteValueDictionary(Model.RouteValues) { ["pageNumber"] = page };
+        return Url.Action(Model.Action, Model.Controller, routeValues) ?? "#";
+    }
+
+    var first = Math.Max(1, Model.PageNumber - 2);
+    var last = Math.Min(Model.TotalPages, Model.PageNumber + 2);
+}
+
+@if (Model.TotalPages > 1)
+{
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center flex-wrap">
+            <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                <a class="page-link js-page-link" href="@Href(Math.Max(1, Model.PageNumber - 1))" data-page="@(Model.PageNumber - 1)" aria-label="Previous">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+            </li>
+
+            @if (first > 1)
+            {
+                <li class="page-item"><a class="page-link js-page-link" href="@Href(1)" data-page="1">1</a></li>
+                @if (first > 2)
+                {
+                    <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+                }
+            }
+
+            @for (var i = first; i <= last; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link js-page-link" href="@Href(i)" data-page="@i" @(i == Model.PageNumber ? "aria-current=page" : "")>@i</a>
+                </li>
+            }
+
+            @if (last < Model.TotalPages)
+            {
+                @if (last < Model.TotalPages - 1)
+                {
+                    <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+                }
+                <li class="page-item"><a class="page-link js-page-link" href="@Href(Model.TotalPages)" data-page="@Model.TotalPages">@Model.TotalPages</a></li>
+            }
+
+            <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+                <a class="page-link js-page-link" href="@Href(Math.Min(Model.TotalPages, Model.PageNumber + 1))" data-page="@(Model.PageNumber + 1)" aria-label="Next">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+}

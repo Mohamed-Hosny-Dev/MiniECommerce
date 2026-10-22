@@ -1,0 +1,97 @@
+@model CheckoutViewModel
+@{
+    ViewData["Title"] = "Checkout";
+    var notices = ViewBag.Notices as IEnumerable<string> ?? Enumerable.Empty<string>();
+}
+
+<h1 class="h2 fw-bold mb-4">Shipping and payment</h1>
+
+@if (notices.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        <div class="fw-bold mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> Your cart was updated. Please review it before confirming:</div>
+        <ul class="mb-0">
+            @foreach (var notice in notices)
+            {
+                <li>@notice</li>
+            }
+        </ul>
+    </div>
+}
+
+<form asp-controller="Checkout" asp-action="Index" method="post" data-single-submit>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm p-4">
+                <h4 class="mb-3 h5 fw-bold"><i class="fa-solid fa-truck text-primary me-2"></i>Shipping address</h4>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="CustomerName" class="form-label">Full name</label>
+                    <input asp-for="CustomerName" class="form-control" autocomplete="name" maxlength="100" />
+                    <span asp-validation-for="CustomerName" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Phone" class="form-label">Mobile number</label>
+                    <input asp-for="Phone" class="form-control" type="tel" inputmode="numeric" autocomplete="tel" maxlength="11" placeholder="01012345678" />
+                    <span asp-validation-for="Phone" class="text-danger small"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Governorate" class="form-label">Governorate</label>
+                        <select asp-for="Governorate" asp-items="@(new SelectList(CheckoutViewModel.Governorates))" class="form-select">
+                            <option value="">Select governorate</option>
+                        </select>
+                        <span asp-validation-for="Governorate" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="City" class="form-label">City / area</label>
+                        <input asp-for="City" class="form-control" maxlength="60" />
+                        <span asp-validation-for="City" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-1">
+                    <label asp-for="Address" class="form-label">Detailed address (street / building / apartment)</label>
+                    <textarea asp-for="Address" class="form-control" rows="3" maxlength="300"></textarea>
+                    <span asp-validation-for="Address" class="text-danger small"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card summary-card border-0 shadow-sm p-4">
+                <h4 class="mb-3 h5 fw-bold"><i class="fa-solid fa-receipt text-primary me-2"></i>Order details</h4>
+                <ul class="list-group list-group-flush mb-3">
+                    @foreach (var item in Model.Cart.Items)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <h6 class="my-0">@item.ProductName</h6>
+                                <small class="text-muted">@item.Quantity &times; @item.UnitPrice.ToEgp()</small>
+                            </div>
+                            <span class="text-muted">@item.Subtotal.ToEgp()</span>
+                        </li>
+                    }
+                    <li class="list-group-item d-flex justify-content-between px-0 fw-bold fs-5">
+                        <span>Total</span>
+                        <strong class="text-primary">@Model.Cart.Total.ToEgp()</strong>
+                    </li>
+                </ul>
+
+                <div class="alert alert-info py-2 small">
+                    <i class="fa-solid fa-money-bill-wave me-1"></i> Payment method: <strong>Cash on delivery</strong>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill">Confirm and place order</button>
+                <a asp-controller="Cart" asp-action="Index" class="btn btn-link w-100 mt-1">Back to cart</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

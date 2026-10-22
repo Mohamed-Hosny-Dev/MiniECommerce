@@ -1,0 +1,78 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h1 class="h2 fw-bold mb-4"><i class="fa-solid fa-gauge-high text-primary me-2"></i>Dashboard</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card text-white p-3 shadow-sm" style="background:linear-gradient(135deg,#4f46e5,#6366f1)">
+            <div class="small opacity-75">Products</div><div class="value">@Model.TotalProducts</div>
+            <i class="fa-solid fa-box icon"></i>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card text-white p-3 shadow-sm" style="background:linear-gradient(135deg,#059669,#10b981)">
+            <div class="small opacity-75">Categories</div><div class="value">@Model.TotalCategories</div>
+            <i class="fa-solid fa-tags icon"></i>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card text-white p-3 shadow-sm" style="background:linear-gradient(135deg,#0284c7,#38bdf8)">
+            <div class="small opacity-75">Orders</div><div class="value">@Model.TotalOrders</div>
+            <i class="fa-solid fa-receipt icon"></i>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card shadow-sm p-3" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)">
+            <div class="small opacity-75">Pending orders</div><div class="value">@Model.PendingOrders</div>
+            <i class="fa-solid fa-clock icon"></i>
+        </div>
+    </div>
+</div>
+
+@if (Model.LowStockProducts > 0)
+{
+    <div class="alert alert-warning d-flex align-items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>@Model.LowStockProducts active product(s) are low on stock or sold out.</span>
+        <a asp-action="Products" class="ms-auto fw-semibold">Review products</a>
+    </div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><a asp-action="Orders" class="btn btn-light border w-100 py-3"><i class="fa-solid fa-list-check text-primary me-1"></i> Orders</a></div>
+    <div class="col-md-3"><a asp-action="Products" class="btn btn-light border w-100 py-3"><i class="fa-solid fa-boxes-packing text-primary me-1"></i> Products</a></div>
+    <div class="col-md-3"><a asp-action="Categories" class="btn btn-light border w-100 py-3"><i class="fa-solid fa-tags text-primary me-1"></i> Categories</a></div>
+    <div class="col-md-3"><a asp-controller="Products" asp-action="Create" class="btn btn-primary w-100 py-3"><i class="fa-solid fa-plus me-1"></i> Add product</a></div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent fw-bold d-flex justify-content-between">
+        <span>Recent orders</span><a asp-action="Orders" class="small">View all</a>
+    </div>
+    @if (!Model.RecentOrders.Any())
+    {
+        <div class="card-body text-muted">No orders yet.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <tbody>
+                    @foreach (var o in Model.RecentOrders)
+                    {
+                        <tr>
+                            <td class="fw-bold">#@o.Id</td>
+                            <td>@o.CustomerName</td>
+                            <td class="text-primary fw-bold">@o.TotalAmount.ToEgp()</td>
+                            <td><partial name="_StatusBadge" model="o.Status" /></td>
+                            <td class="text-muted small text-end">@o.OrderDate.ToCairoString()</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

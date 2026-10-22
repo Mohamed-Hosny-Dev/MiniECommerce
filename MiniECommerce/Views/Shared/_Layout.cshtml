@@ -1,0 +1,148 @@
+@using MiniECommerce.Services.Interfaces
+@using Microsoft.AspNetCore.Antiforgery
+@inject ICartService CartService
+@inject IAntiforgery Antiforgery
+@{
+    var cartCount = CartService.GetCart().ItemCount;
+    var csrfToken = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="@(ViewData["Description"] ?? "Shop the latest products and pay when your order arrives.")" />
+    <meta name="csrf-token" content="@csrfToken" />
+    <meta name="app-base" content="@Url.Content("~/")" />
+    <title>@ViewData["Title"] - Our Store</title>
+    <link rel="icon" href="~/favicon.ico" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="site-header sticky-top">
+        <nav class="navbar navbar-expand-lg border-bottom">
+            <div class="container">
+                <a class="navbar-brand fw-bold d-flex align-items-center gap-2" asp-controller="Home" asp-action="Index">
+                    <span class="brand-mark"><i class="fa-solid fa-bag-shopping"></i></span> Our Store
+                </a>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "Home" ? "active" : "")" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "Products" ? "active" : "")" asp-controller="Products" asp-action="Index">Products</a>
+                        </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-warning-emphasis @(currentController == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="Index">
+                                    <i class="fa-solid fa-gauge-high"></i> Control Panel
+                                </a>
+                            </li>
+                        }
+                    </ul>
+
+                    <form class="nav-search me-lg-3" asp-controller="Products" asp-action="Index" method="get" role="search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="search" name="search" class="form-control" placeholder="Search products" aria-label="Search products" maxlength="100" />
+                    </form>
+
+                    <ul class="navbar-nav align-items-lg-center gap-lg-1">
+                        <li class="nav-item me-lg-1">
+                            <a class="nav-link cart-link" asp-controller="Cart" asp-action="Index" aria-label="Shopping cart">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                <span class="d-lg-none ms-1">Shopping Cart</span>
+                                <span id="cart-badge-count" class="cart-badge @(cartCount == 0 ? "d-none" : "")">@cartCount</span>
+                            </a>
+                        </li>
+                        <partial name="_LoginPartial" />
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mt-4">
+        @if (TempData["SuccessMessage"] is string successMessage)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fa-solid fa-circle-check me-1"></i> @successMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] is string errorMessage)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fa-solid fa-circle-exclamation me-1"></i> @errorMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    </div>
+
+    <main role="main" class="container pb-4">
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer">
+        <div class="container py-5">
+            <div class="row g-4">
+                <div class="col-md-5">
+                    <div class="d-flex align-items-center gap-2 mb-2 text-white fw-bold fs-5">
+                        <span class="brand-mark"><i class="fa-solid fa-bag-shopping"></i></span> Our Store
+                    </div>
+                    <p class="mb-0">Quality products, simple ordering and cash on delivery.</p>
+                </div>
+                <div class="col-6 col-md-3 offset-md-1">
+                    <h6>Shop</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li><a asp-controller="Products" asp-action="Index">All products</a></li>
+                        <li><a asp-controller="Cart" asp-action="Index">Shopping cart</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-md-3">
+                    <h6>Account</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li><a asp-controller="Orders" asp-action="Index">My orders</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-secondary-subtle my-4" />
+            <div class="small">&copy; @DateTime.Now.Year Our Store. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- Toasts -->
+    <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3" aria-live="polite"></div>
+
+    <!-- Confirm dialog (used instead of window.confirm) -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-body p-4 text-center">
+                    <div class="confirm-icon mb-3"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <h5 class="mb-2" id="confirmTitle">Are you sure?</h5>
+                    <p class="text-muted mb-4" id="confirmMessage"></p>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" id="confirmOk">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/cart.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

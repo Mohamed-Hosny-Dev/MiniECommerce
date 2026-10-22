@@ -1,0 +1,97 @@
+@model ProductDetailsViewModel
+@{
+    var product = Model.Product;
+    ViewData["Title"] = product.Name;
+    ViewData["Description"] = product.Description;
+    var maxQty = Math.Min(product.Stock, CartViewModel.MaxQuantityPerItem);
+    var placeholder = Url.Content("~/images/default-product.svg");
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Products" asp-action="Index">Products</a></li>
+        @if (product.Category != null)
+        {
+            <li class="breadcrumb-item"><a asp-controller="Products" asp-action="Index" asp-route-categoryId="@product.CategoryId">@product.Category.Name</a></li>
+        }
+        <li class="breadcrumb-item active" aria-current="page">@product.Name</li>
+    </ol>
+</nav>
+
+<div class="row g-4 g-lg-5">
+    <div class="col-md-5">
+        <div class="details-media shadow-sm">
+            <img src="@Url.ProductImage(product.ImageUrl)" data-fallback="@placeholder" alt="@product.Name" />
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        @if (product.Category != null)
+        {
+            <span class="badge rounded-pill text-bg-light border mb-2">@product.Category.Name</span>
+        }
+        <h1 class="fw-bold mb-2">@product.Name</h1>
+        <div class="details-price mb-3">@product.Price.ToEgp()</div>
+
+        <div class="mb-3">
+            @if (product.Stock <= 0)
+            {
+                <span class="badge rounded-pill text-bg-danger"><i class="fa-solid fa-ban me-1"></i> Out of stock</span>
+            }
+            else if (product.Stock <= 5)
+            {
+                <span class="badge rounded-pill text-bg-warning"><i class="fa-solid fa-bolt me-1"></i> Only @product.Stock left</span>
+            }
+            else
+            {
+                <span class="badge rounded-pill text-bg-success"><i class="fa-solid fa-circle-check me-1"></i> In stock</span>
+            }
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(product.Description))
+        {
+            <p class="text-muted fs-5">@product.Description</p>
+        }
+
+        <hr />
+
+        @if (product.Stock > 0)
+        {
+            <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+                <div class="qty-stepper" data-qty-group>
+                    <button type="button" class="btn" data-qty-step="-1" aria-label="Decrease quantity"><i class="fa-solid fa-minus"></i></button>
+                    <input type="number" id="quantitySelect" class="form-control" value="1" min="1" max="@maxQty" aria-label="Quantity" />
+                    <button type="button" class="btn" data-qty-step="1" aria-label="Increase quantity"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <button type="button" class="btn btn-primary btn-lg rounded-pill px-4" data-add-to-cart data-product-id="@product.Id" data-quantity-input="#quantitySelect">
+                    <i class="fa-solid fa-cart-plus me-1"></i> Add to cart
+                </button>
+            </div>
+            <p class="text-muted small"><i class="fa-solid fa-money-bill-wave me-1"></i> Cash on delivery available</p>
+        }
+
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            <a asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary rounded-pill"><i class="fa-solid fa-arrow-left me-1"></i> Back to products</a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-controller="Products" asp-action="Edit" asp-route-id="@product.Id" class="btn btn-outline-primary rounded-pill"><i class="fa-solid fa-pen me-1"></i> Edit</a>
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.Related.Any())
+{
+    <section class="mt-5">
+        <div class="section-head"><h2>You may also like</h2></div>
+        <div class="row g-4">
+            @foreach (var related in Model.Related)
+            {
+                <div class="col-6 col-md-4 col-lg-3">
+                    <partial name="_ProductCard" model="related" />
+                </div>
+            }
+        </div>
+    </section>
+}

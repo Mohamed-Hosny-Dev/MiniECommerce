@@ -1,0 +1,65 @@
+@using Microsoft.AspNetCore.Identity
+@using MiniECommerce.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<ul class="navbar-nav ms-auto align-items-center">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        var currentUser = await UserManager.GetUserAsync(User);
+        string displayName = "";
+
+        if (User.IsInRole("Admin"))
+        {
+            displayName = "Admin (" + (currentUser?.FirstName ?? User.Identity?.Name?.Split('@')[0]) + ")";
+        }
+        else
+        {
+            displayName = currentUser?.FirstName;
+            if (string.IsNullOrWhiteSpace(displayName))
+            {
+                displayName = User.Identity?.Name?.Split('@')[0];
+            }
+        }
+
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-regular fa-circle-user fa-lg text-primary"></i>
+                <span class="fw-semibold">@displayName</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
+                <li class="px-3 py-2 text-muted small border-bottom">
+                    Signed in as <br /><strong class="text-dark">@User.Identity?.Name</strong>
+                </li>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <li><a class="dropdown-item py-2" asp-controller="Admin" asp-action="Index"><i class="fa-solid fa-chart-line fa-fw me-2 text-primary"></i> Dashboard</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                }
+                else
+                {
+                    <li><a class="dropdown-item py-2" asp-controller="Orders" asp-action="Index"><i class="fa-solid fa-box-archive fa-fw me-2 text-primary"></i> My Orders</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                }
+
+                <li><a class="dropdown-item py-2" asp-controller="Profile" asp-action="Index"><i class="fa-solid fa-gear fa-fw me-2 text-secondary"></i> Settings</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="m-0">
+                        <button type="submit" class="dropdown-item py-2 text-danger"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i> Logout</button>
+                    </form>
+                </li>
+            </ul>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item me-2">
+            <a class="nav-link fw-medium" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        </li>
+        <li class="nav-item">
+            <a class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm" asp-area="Identity" asp-page="/Account/Register">Create Account</a>
+        </li>
+    }
+</ul>

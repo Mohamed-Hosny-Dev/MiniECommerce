@@ -1,0 +1,19 @@
+@model MiniECommerce.Models.OrderStatus
+@switch (Model)
+{
+    case OrderStatus.Pending:
+        <span class="badge rounded-pill text-bg-warning">Pending</span>
+        break;
+    case OrderStatus.Processing:
+        <span class="badge rounded-pill text-bg-info">Processing</span>
+        break;
+    case OrderStatus.Shipped:
+        <span class="badge rounded-pill text-bg-primary">Shipped</span>
+        break;
+    case OrderStatus.Delivered:
+        <span class="badge rounded-pill text-bg-success">Delivered</span>
+        break;
+    case OrderStatus.Cancelled:
+        <span class="badge rounded-pill text-bg-danger">Cancelled</span>
+        break;
+}

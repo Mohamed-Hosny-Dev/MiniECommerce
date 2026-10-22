@@ -1,0 +1,64 @@
+@model AdminOrderListViewModel
+
+@if (!Model.Orders.Any())
+{
+    <div class="alert alert-warning text-center my-3">No orders match the search or filter.</div>
+}
+else
+{
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th><th>Customer</th><th>Phone</th><th>Total</th><th>Date</th><th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model.Orders)
+                    {
+                        var allowed = OrderStatusRules.AllowedNext(order.Status);
+                        <tr id="order-row-@order.Id">
+                            <td class="fw-bold">#@order.Id</td>
+                            <td>@order.CustomerName<div class="small text-muted">@order.City, @order.Governorate</div></td>
+                            <td>@order.CustomerPhone</td>
+                            <td class="fw-bold text-primary">@order.TotalAmount.ToEgp()</td>
+                            <td class="small">@order.OrderDate.ToCairoString()</td>
+                            <td>
+                                @if (allowed.Count == 0)
+                                {
+                                    <partial name="_StatusBadge" model="order.Status" />
+                                }
+                                else
+                                {
+                                    <select class="form-select form-select-sm js-status-select" data-order-id="@order.Id" data-current="@((int)order.Status)" aria-label="Order status">
+                                        <option value="@((int)order.Status)" selected="selected">@order.Status</option>
+                                        @foreach (var next in allowed)
+                                        {
+                                            <option value="@((int)next)" data-cancel="@(next == OrderStatus.Cancelled ? 1 : 0)">@next</option>
+                                        }
+                                    </select>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <p class="text-muted small mt-2">@Model.TotalCount order(s)</p>
+
+    <partial name="_Pager" model="@(new PagerViewModel
+    {
+        PageNumber = Model.PageNumber,
+        TotalPages = Model.TotalPages,
+        Action = "Orders",
+        Controller = "Admin",
+        RouteValues = new Dictionary<string, object?>
+        {
+            ["search"] = Model.Search,
+            ["status"] = Model.Status.HasValue ? (int?)Model.Status.Value : null
+        }
+    })" />
+}

@@ -1,0 +1,21 @@
+@model ProductListViewModel
+@{
+    ViewData["Title"] = "Manage products";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <h1 class="h2 fw-bold mb-0"><i class="fa-solid fa-boxes-packing text-primary me-2"></i>Products</h1>
+    <a asp-controller="Products" asp-action="Create" class="btn btn-primary rounded-pill px-4"><i class="fa-solid fa-plus me-1"></i> Add product</a>
+</div>
+
+<div class="card border-0 shadow-sm p-3 mb-4">
+    <input type="search" id="adminProductSearch" class="form-control" value="@Model.SearchQuery" placeholder="Search products..." aria-label="Search products" />
+</div>
+
+<div id="adminProductsContainer">
+    <partial name="_AdminProductTablePartial" model="Model" />
+</div>
+
+@section Scripts {
+    <script src="~/js/admin.js" asp-append-version="true"></script>
+}

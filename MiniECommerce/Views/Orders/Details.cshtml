@@ -1,0 +1,87 @@
+@model Order
+@{
+    ViewData["Title"] = $"Order #{Model.Id}";
+    var steps = new[]
+    {
+        (OrderStatus.Pending, "Order placed", "fa-receipt"),
+        (OrderStatus.Processing, "Preparing", "fa-box-open"),
+        (OrderStatus.Shipped, "On the way", "fa-truck-fast"),
+        (OrderStatus.Delivered, "Delivered", "fa-circle-check")
+    };
+    var currentIndex = Array.FindIndex(steps, s => s.Item1 == Model.Status);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 fw-bold mb-0">Order #@Model.Id</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">Back to orders</a>
+</div>
+
+<div class="card border-0 shadow-sm p-4 mb-4">
+    @if (Model.Status == OrderStatus.Cancelled)
+    {
+        <div class="text-danger fw-semibold"><i class="fa-solid fa-ban me-1"></i> This order was cancelled.</div>
+    }
+    else
+    {
+        <ol class="order-steps">
+            @for (var i = 0; i < steps.Length; i++)
+            {
+                <li class="@(i <= currentIndex ? "done" : "") @(i == currentIndex ? "current" : "")">
+                    <span class="dot"><i class="fa-solid @steps[i].Item3"></i></span>
+                    <span>@steps[i].Item2</span>
+                </li>
+            }
+        </ol>
+    }
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent fw-bold">Items</div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th>Product</th><th>Unit price</th><th>Qty</th><th class="text-end">Total</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            <tr>
+                                <td>@item.Product?.Name</td>
+                                <td>@item.UnitPrice.ToEgp()</td>
+                                <td>@item.Quantity</td>
+                                <td class="fw-bold text-end">@((item.UnitPrice * item.Quantity).ToEgp())</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="fw-bold border-bottom pb-2">Order information</h5>
+                <p class="mb-1"><strong>Date:</strong> @Model.OrderDate.ToCairoString()</p>
+                <p class="mb-1"><strong>Status:</strong> <partial name="_StatusBadge" model="Model.Status" /></p>
+                <p class="mb-1"><strong>Recipient:</strong> @Model.CustomerName</p>
+                <p class="mb-1"><strong>Phone:</strong> @Model.CustomerPhone</p>
+                <p class="mb-1"><strong>Address:</strong> @Model.Address, @Model.City, @Model.Governorate</p>
+                <hr />
+                <div class="d-flex justify-content-between text-primary fs-5 fw-bold">
+                    <span>Total</span><span>@Model.TotalAmount.ToEgp()</span>
+                </div>
+
+                @if (Model.Status == OrderStatus.Pending)
+                {
+                    <form asp-action="Cancel" asp-route-id="@Model.Id" method="post" class="mt-3"
+                          data-confirm="This order will be cancelled and the items returned to stock." data-confirm-ok="Cancel order">
+                        <button type="submit" class="btn btn-outline-danger w-100 rounded-pill">Cancel order</button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>

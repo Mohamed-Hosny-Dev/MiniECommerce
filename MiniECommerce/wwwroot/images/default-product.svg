@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" role="img" aria-label="No image available">
+  <rect width="600" height="450" fill="#eef0f6"/>
+  <g fill="none" stroke="#b6bccd" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M300 130 L410 185 V300 L300 355 L190 300 V185 Z"/>
+    <path d="M190 185 L300 240 L410 185"/>
+    <path d="M300 240 V355"/>
+  </g>
+</svg>

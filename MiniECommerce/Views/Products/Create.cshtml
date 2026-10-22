@@ -1,0 +1,15 @@
+@model ProductFormViewModel
+@{
+    ViewData["Title"] = "Add product";
+}
+
+<h1 class="h2 fw-bold mb-4">Add product</h1>
+
+<form asp-controller="Products" asp-action="Create" method="post" enctype="multipart/form-data" novalidate="novalidate">
+    <partial name="_ProductForm" model="Model" />
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/admin.js" asp-append-version="true"></script>
+}

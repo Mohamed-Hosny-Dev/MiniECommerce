@@ -1,0 +1,150 @@
+@model HomeViewModel
+@{
+    ViewData["Title"] = "Home";
+    var heroProducts = Model.LatestProducts.Take(4).ToList();
+    var popular = Model.Categories.Where(c => c.ProductCount > 0).OrderByDescending(c => c.ProductCount).Take(4).ToList();
+    var placeholder = Url.Content("~/images/default-product.svg");
+}
+
+<!-- ============ Hero ============ -->
+<section class="hero mb-4">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-6">
+            <span class="hero-eyebrow"><i class="fa-solid fa-hand-holding-dollar"></i> Pay when it arrives</span>
+            <h1 class="hero-title">Everything you need, <span class="accent">delivered to your door.</span></h1>
+            <p class="hero-lead">Browse our latest products, add what you love to your cart and pay cash on delivery.</p>
+
+            <form class="hero-search" asp-controller="Products" asp-action="Index" method="get" role="search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" name="search" class="form-control" placeholder="What are you looking for?" aria-label="Search products" maxlength="100" />
+                <button type="submit" class="btn btn-warning">Search</button>
+            </form>
+
+            @if (popular.Any())
+            {
+                <div class="hero-pills">
+                    <span>Popular:</span>
+                    @foreach (var c in popular)
+                    {
+                        <a asp-controller="Products" asp-action="Index" asp-route-categoryId="@c.Id">@c.Name</a>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="col-lg-6 d-none d-lg-block">
+            @if (heroProducts.Count > 0)
+            {
+                <div class="hero-collage">
+                    @foreach (var p in heroProducts)
+                    {
+                        <a class="hero-tile" asp-controller="Products" asp-action="Details" asp-route-id="@p.Id" aria-label="@p.Name">
+                            <img src="@Url.ProductImage(p.ImageUrl)" data-fallback="@placeholder" alt="@p.Name" />
+                            <span class="tag">@p.Price.ToEgp()</span>
+                        </a>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="hero-empty"><i class="fa-solid fa-bag-shopping"></i></div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ============ Benefits ============ -->
+<section class="row g-3 mb-5">
+    <div class="col-md-4">
+        <div class="feature">
+            <span class="icon"><i class="fa-solid fa-money-bill-wave"></i></span>
+            <div><h6>Cash on delivery</h6><p>No online payment needed. Pay when your order reaches you.</p></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="feature">
+            <span class="icon"><i class="fa-solid fa-truck-fast"></i></span>
+            <div><h6>Track your orders</h6><p>Follow every order from placed to delivered in My Orders.</p></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="feature">
+            <span class="icon"><i class="fa-solid fa-rotate-left"></i></span>
+            <div><h6>Easy cancellation</h6><p>Changed your mind? Cancel a pending order in one click.</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ Categories ============ -->
+@if (Model.Categories.Any())
+{
+    <section class="mb-5">
+        <div class="section-head">
+            <div>
+                <h2>Shop by category</h2>
+                <p>Find what you need faster.</p>
+            </div>
+        </div>
+        <div class="row g-3">
+            @foreach (var category in Model.Categories)
+            {
+                <div class="col-6 col-md-4 col-lg-3">
+                    <a class="category-tile" asp-controller="Products" asp-action="Index" asp-route-categoryId="@category.Id">
+                        <span class="icon"><i class="fa-solid @FormatExtensions.CategoryIcon(category.Name)"></i></span>
+                        <span>
+                            <span class="name d-block">@category.Name</span>
+                            <span class="count">@category.ProductCount @(category.ProductCount == 1 ? "product" : "products")</span>
+                        </span>
+                    </a>
+                </div>
+            }
+        </div>
+    </section>
+}
+
+<!-- ============ New arrivals ============ -->
+<section class="mb-5">
+    <div class="section-head">
+        <div>
+            <h2>New arrivals</h2>
+            <p>The latest additions to our store.</p>
+        </div>
+        @if (Model.LatestProducts.Any())
+        {
+            <a asp-controller="Products" asp-action="Index" class="btn btn-outline-primary rounded-pill px-3">View all <i class="fa-solid fa-arrow-right ms-1"></i></a>
+        }
+    </div>
+
+    @if (Model.LatestProducts.Any())
+    {
+        <div class="row g-4">
+            @foreach (var product in Model.LatestProducts)
+            {
+                <div class="col-6 col-md-4 col-lg-3">
+                    <partial name="_ProductCard" model="product" />
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm text-center py-5">
+            <div class="card-body">
+                <i class="fa-solid fa-box-open fa-3x text-muted mb-3"></i>
+                <h5>No products yet</h5>
+                <p class="text-muted mb-3">New products will appear here as soon as they are added.</p>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Products" asp-action="Create" class="btn btn-primary rounded-pill px-4">Add the first product</a>
+                }
+            </div>
+        </div>
+    }
+</section>
+
+<!-- ============ Call to action ============ -->
+<section class="hero text-center py-5">
+    <h2 class="fw-bold mb-2">Can't find what you're looking for?</h2>
+    <p class="hero-lead mx-auto mb-4">Search the whole catalogue or browse by category - new products are added all the time.</p>
+    <a asp-controller="Products" asp-action="Index" class="btn btn-warning btn-lg rounded-pill px-5 fw-semibold">Browse all products</a>
+</section>

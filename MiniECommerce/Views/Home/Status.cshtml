@@ -1,0 +1,18 @@
+@{
+    int code = ViewBag.Code is int c ? c : 404;
+    ViewData["Title"] = code == 404 ? "Page not found" : "Oops";
+    var message = code switch
+    {
+        404 => "The page you are looking for doesn't exist or was moved.",
+        403 => "You don't have permission to see this page.",
+        _ => "Something went wrong with your request."
+    };
+}
+
+<div class="text-center py-5">
+    <div class="status-code">@code</div>
+    <h2 class="fw-bold mt-2">@(code == 404 ? "Page not found" : "Oops")</h2>
+    <p class="text-muted mb-4">@message</p>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary rounded-pill px-4 me-2">Back to home</a>
+    <a asp-controller="Products" asp-action="Index" class="btn btn-outline-primary rounded-pill px-4">Browse products</a>
+</div>
